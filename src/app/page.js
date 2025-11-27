@@ -1,4 +1,7 @@
+"use client"
 import Image from "next/image";
+import { useState, useEffect } from "react";
+import ContentstackLivePreview from "@contentstack/live-preview-utils";
 
 /*import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -22,25 +25,19 @@ function Button(props) {
       </button>
   );
 }
-/**
-* A small, colored inline indicator component.
-*/
+
 function Badge({ children, className = "" }) {
   return <span className={["cs-badge", className].join(" ")}>{children}</span>
 }
-/**
-* A container component for grouping related UI elements.
-*/
+
 function Card({ children, className = "" }) {
   return <div className={["cs-card", className].join(" ")}>{children}</div>
 }
-/**
-* Inner content area for the Card component.
-*/
+
 function CardContent({ children, className = "" }) {
   return <div className={["cs-card-content", className].join(" ")}>{children}</div>
 }
-// Main application component to showcase the components and define styling
+
 export function App() {
   return (
       <div className="min-h-screen bg-gray-50 p-6 font-inter">
@@ -101,8 +98,28 @@ export function App() {
 
 import { ArrowRight, Check, Star, Users, Zap, Shield, Globe, ChevronDown } from "lucide-react"
 import React from 'react';
+import { fetchHomePage, initializeLP } from "./sdk";
+initializeLP();
 
 export default function ContentstackPage() {
+  let [entry , setEntry]  = useState({});
+  useEffect(() => {
+    async function run(){
+      let res =await fetchHomePage();
+      setEntry(res)
+    }
+    run()
+
+    ContentstackLivePreview.onEntryChange = async function(){
+      let res = await fetchHomePage();
+      setEntry(res);
+    }
+    return () => {
+      ContentstackLivePreview.onEntryChange = () => {};
+      setEntry({})
+    }
+
+  },[])
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -112,7 +129,7 @@ export default function ContentstackPage() {
             <div className="flex items-center space-x-8">
               <div className="flex items-center">
                 <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">C</span>
+                  <span className="text-white font-bold text-sm">CS</span>
                 </div>
                 <span className="ml-2 text-xl font-bold text-gray-900">Contentstack</span>
               </div>
@@ -185,15 +202,10 @@ export default function ContentstackPage() {
                   #1 Headless CMS Platform
                 </Badge>
                 <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                  Build digital experiences at
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 animate-pulse">
-                    {" "}
-                    scale
-                  </span>
+                  {entry.title && entry.title}
                 </h1>
                 <p className="text-xl text-gray-600 leading-relaxed">
-                  Contentstack is the headless CMS that enables enterprises to build, manage, and deliver digital
-                  experiences across any channel, faster than ever before.
+                  {entry.description && entry.description}
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -511,7 +523,7 @@ export default function ContentstackPage() {
             <div className="space-y-4">
               <div className="flex items-center">
                 <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">C</span>
+                  <span className = "text-white font-bold text-sm">CS</span>
                 </div>
                 <span className="ml-2 text-xl font-bold">Contentstack</span>
               </div>
